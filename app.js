@@ -4,20 +4,26 @@ const port = 3000; // or any port of your choice
 
 app.use(express.json());
 
-const { degrees, PDFDocument, rgb, StandardFonts } = require('pdf-lib');
+const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
 const fs = require('fs').promises;
 
 
-app.get('/download', (req,res) =>{
-  const file = `${__dirname}/certificates/generated-pdf.pdf`;
+app.get('/download/:id', (req,res) =>{
+  const fileid = req.params.id;
+
+  const file = `${__dirname}/certificates/${fileid}`;
   res.download(file);
 });
 
 
-app.get('/gen/:name', async (req,res) => {
-
+app.get('/generate/:name', async (req,res) => {
   const name = req.params.name;
 
+  // const pattern = /^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$/;
+
+  // if(!pattern.test(name))
+  //   return res.status(200).json({status:"error", message: "Only Alphabets and Numbers allowed in Name"})
+  
   const url = __dirname + '/GreenIndiaCert.pdf';
   const existingPdfBytes = await fs.readFile(url);
 
@@ -28,7 +34,7 @@ app.get('/gen/:name', async (req,res) => {
 
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
-  const { width, height } = firstPage.getSize()
+  const { height } = firstPage.getSize()
 
   // Calculate the width of the text
   const textWidth = helveticaFont.widthOfTextAtSize(name, fontSize);
@@ -57,11 +63,19 @@ app.get('/gen/:name', async (req,res) => {
   })
 
   const pdfBytes = await pdfDoc.save()
-  // await fs.writeFile(`certificates/GreenIndiaCert-${currentTimestamp}.pdf`, pdfBytes);
-  await fs.writeFile(`certificates/generated-pdf.pdf`, pdfBytes);
 
-  res.json({ status: "success", message: name, certficateId: currentTimestamp, certificateFile: 'http://localhost:3000/certificates/generated-pdf.pdf'});
+  const fileName = `GreenIndiaCert-${currentTimestamp}.pdf`
+  await fs.writeFile('certificates/'+fileName, pdfBytes);
+  
+  // developement mode
+  //await fs.writeFile(`certificates/generated-pdf.pdf`, pdfBytes);
 
+  res.status(201).json({ status: "success", message: name, certficateId: currentTimestamp, certificateFile: '/download/'+fileName});
+
+});
+
+app.get('/',(req, res)=>{
+  res.status(200).json({message: "Certificate Generate Rest API", link: "github.com/sanjaysrocks", Usage: "To Create Certificate Use /generate/<name> endpoint"})
 });
 
 
