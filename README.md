@@ -39,7 +39,7 @@ To deploy this project run
 
 ## Screenshots
 
-![Certificate Screenshot](https://github.com/SanjaySRocks/CertificateGenerator/blob/main/screenshot/GreenIndiaCert-1694541456.jpg?raw=true)
+![Certificate Screenshot](screenshot/GreenIndiaCert-1694541456.jpg?raw=true)
 
 
 ## Authors
