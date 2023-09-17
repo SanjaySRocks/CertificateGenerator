@@ -7,6 +7,8 @@ app.use(express.json());
 app.use(cors());
 
 const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
+const fontkit = require('@pdf-lib/fontkit');
+
 const fs = require('fs').promises;
 
 
@@ -26,32 +28,49 @@ app.get('/generate/:name', async (req,res) => {
   // if(!pattern.test(name))
   //   return res.status(200).json({status:"error", message: "Only Alphabets and Numbers allowed in Name"})
   
-  const url = __dirname + '/GreenIndiaCert.pdf';
+  const url = __dirname + '/certificate.pdf';
   const existingPdfBytes = await fs.readFile(url);
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes)
-  const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica)
+  const courierBoldText = await pdfDoc.embedFont(StandardFonts.CourierBold)
   const TimesRoman = await pdfDoc.embedFont(StandardFonts.TimesRomanBold)
+  
+  // Custom Font To Do
+  /*const StyleScriptBytes = await fs.readFile('customfonts/StyleScript-Regular.ttf');
+  pdfDoc.registerFontkit(fontkit);
+  const StyleScript = await pdfDoc.embedFont(StyleScriptBytes);*/
+
   const fontSize = 30;
 
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
-  const { height } = firstPage.getSize()
+  const { width, height } = firstPage.getSize()
 
   // Calculate the width of the text
-  const textWidth = helveticaFont.widthOfTextAtSize(name, fontSize);
+  const textWidth = courierBoldText.widthOfTextAtSize(name, fontSize);
 
   // Calculate the horizontal center position
   const centerX = (firstPage.getWidth() - textWidth) / 2;
 
+  const date = new Date();
+
   const currentTimestamp = Math.floor(new Date().getTime() / 1000);
   
+  // Print Date Id
+  firstPage.drawText(date.toISOString().slice(0,10), {
+    x: width -140,
+    y: 80,
+    size: fontSize - 16,
+    font: courierBoldText,
+    color: rgb(0, 0, 0),
+  })
+
   // Print Certificate ID
   firstPage.drawText(currentTimestamp.toString(), {
-    x: 40,
-    y: height/2 + 140,
+    x: 80,
+    y: height/2 + 106,
     size: fontSize - 16,
-    font: helveticaFont,
+    font: courierBoldText,
     color: rgb(0, 0, 0),
   })
 
