@@ -14,6 +14,13 @@ To deploy this project run
   npm start
 ```
 
+# Run in Docker
+## To build image locally
+``` docker build -t cg . ```
+
+## To run directly through uploaded docker image
+``` docker run -d -p 3000:3000 sanjaysrocks/cg:v2 ```
+
 
 # API Endpoints
 
