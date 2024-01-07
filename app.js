@@ -19,9 +19,12 @@ app.get('/download/:id', (req,res) =>{
   res.download(file);
 });
 
+app.post('/generate', async (req,res) => {
+  console.log(req.body)
+  const name = req.body.name;
 
-app.get('/generate/:name', async (req,res) => {
-  const name = req.params.name;
+  if(!name)
+    return res.status(200).json({status:"error", message: "Invalid Certificate Name"})
 
   // const pattern = /^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$/;
 
@@ -84,19 +87,25 @@ app.get('/generate/:name', async (req,res) => {
   })
 
   const pdfBytes = await pdfDoc.save()
+  const base64String = Buffer.from(pdfBytes).toString('base64');
 
   const fileName = `GreenIndiaCert-${currentTimestamp}.pdf`
-  await fs.writeFile('certificates/'+fileName, pdfBytes);
+
+  //await fs.writeFile('certificates/'+fileName, pdfBytes);
   
   // developement mode
   //await fs.writeFile(`certificates/generated-pdf.pdf`, pdfBytes);
 
-  res.status(201).json({ status: "success", message: name, certficateId: currentTimestamp, certificateFile: '/download/'+fileName});
+  res.status(201).json(
+    { 
+      status: "success", message: name, certficateId: currentTimestamp, 
+      file:{ fileName: fileName, contentType: 'application/pdf', data: base64String }
+    });
 
 });
 
 app.get('/',(req, res)=>{
-  res.status(200).json({message: "Certificate Generate Rest API", link: "github.com/sanjaysrocks", Usage: "To Create Certificate Use /generate/<name> endpoint"})
+  res.status(200).json({message: "Certificate Generate Rest API", link: "github.com/sanjaysrocks", Usage: "To Create Certificate Use /generate endpoint (post request)"})
 });
 
 
