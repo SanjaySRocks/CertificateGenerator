@@ -1,17 +1,22 @@
 const express = require('express');
 const cors = require('cors');
+
+// Pdf lib
+const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
+const fontkit = require('@pdf-lib/fontkit');
+
+// Fs
+const fs = require('fs').promises;
+
+// Express Js
 const app = express();
 const port = 3000; // or any port of your choice
 
 app.use(express.json());
 app.use(cors());
 
-const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
-const fontkit = require('@pdf-lib/fontkit');
 
-const fs = require('fs').promises;
-
-
+// Download File Route
 app.get('/download/:id', (req,res) =>{
   const fileid = req.params.id;
 
@@ -19,32 +24,21 @@ app.get('/download/:id', (req,res) =>{
   res.download(file);
 });
 
+// Generate Route
 app.post('/generate', async (req,res) => {
-  console.log(req.body)
   const name = req.body.name;
 
   if(!name)
     return res.status(200).json({status:"error", message: "Invalid Certificate Name"})
 
-  // const pattern = /^[a-zA-Z0-9]+(?: [a-zA-Z0-9]+)*$/;
-
-  // if(!pattern.test(name))
-  //   return res.status(200).json({status:"error", message: "Only Alphabets and Numbers allowed in Name"})
-  
   const url = __dirname + '/certificate.pdf';
   const existingPdfBytes = await fs.readFile(url);
 
   const pdfDoc = await PDFDocument.load(existingPdfBytes)
   const courierBoldText = await pdfDoc.embedFont(StandardFonts.CourierBold)
   const TimesRoman = await pdfDoc.embedFont(StandardFonts.TimesRomanBold)
-  
-  // Custom Font To Do
-  /*const StyleScriptBytes = await fs.readFile('customfonts/StyleScript-Regular.ttf');
-  pdfDoc.registerFontkit(fontkit);
-  const StyleScript = await pdfDoc.embedFont(StyleScriptBytes);*/
 
   const fontSize = 30;
-
   const pages = pdfDoc.getPages()
   const firstPage = pages[0]
   const { width, height } = firstPage.getSize()
@@ -54,9 +48,7 @@ app.post('/generate', async (req,res) => {
 
   // Calculate the horizontal center position
   const centerX = (firstPage.getWidth() - textWidth) / 2;
-
   const date = new Date();
-
   const currentTimestamp = Math.floor(new Date().getTime() / 1000);
   
   // Print Date Id
@@ -91,10 +83,10 @@ app.post('/generate', async (req,res) => {
 
   const fileName = `GreenIndiaCert-${currentTimestamp}.pdf`
 
-  //await fs.writeFile('certificates/'+fileName, pdfBytes);
+  await fs.writeFile('certificates/'+fileName, pdfBytes);
   
   // developement mode
-  //await fs.writeFile(`certificates/generated-pdf.pdf`, pdfBytes);
+  // await fs.writeFile(`certificates/generated-pdf.pdf`, pdfBytes);
 
   res.status(201).json(
     { 
@@ -104,6 +96,7 @@ app.post('/generate', async (req,res) => {
 
 });
 
+// Default Route
 app.get('/',(req, res)=>{
   res.status(200).json({message: "Certificate Generate Rest API", link: "github.com/sanjaysrocks", Usage: "To Create Certificate Use /generate endpoint (post request)"})
 });
