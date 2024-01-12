@@ -1,24 +1,19 @@
-const { Schema, model } = require('mongoose');
+const mongoose = require('mongoose');
 
-// Create a schema
-const CertificateSchema = new Schema({
-    fullName: {
-        type: String,
-        required: true
-    },
-    phoneNo: {
-        type: Number,
-        default: 18
-    },
-    email: {
-        type: String,
-        unique: true,
-        required: true
-    },
 
-    }, {   timestamps: true });
+const dbURI = `mongodb+srv://220159:220159password@cluster0.0ipredr.mongodb.net/certificate_app?retryWrites=true&w=majority`;
 
-// Create a model using the schema
-const Certificate = model('Certificate', CertificateSchema);
 
-module.exports = Certificate;
+async function connectToDatabase() {
+
+    try{
+        await mongoose.connect(dbURI);
+        console.log("Connected to mongodb certificate_app database!")
+    }
+    catch(err)
+    {
+        console.log("Database error: ",err);
+    }
+}
+
+module.exports = { connectToDatabase };

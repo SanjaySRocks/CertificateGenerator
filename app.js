@@ -8,6 +8,8 @@ const fontkit = require('@pdf-lib/fontkit');
 // Fs
 const fs = require('fs').promises;
 
+const { connectToDatabase } = require('./database/mongodb')
+
 // Express Js
 const app = express();
 const port = 3000; // or any port of your choice
@@ -15,6 +17,8 @@ const port = 3000; // or any port of your choice
 app.use(express.json());
 app.use(cors());
 
+// Connect Database
+connectToDatabase();
 
 // Download File Route
 app.get('/download/:id', (req,res) =>{
