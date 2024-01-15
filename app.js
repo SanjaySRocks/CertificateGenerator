@@ -33,16 +33,17 @@ app.get('/download/:id', (req, res) => {
 app.post('/generate', async (req, res) => {
   const { fullName, phoneNo, email } = req.body;
 
-  if (!fullName)
-    return res.status(200).json({ status: "error", message: "Invalid Certificate Name" })
+  var duplicateKey = null;
+
+  if (!fullName || !phoneNo || !email)
+    return res.status(400).json({ status: "error", message: "Bad Request Check all required fields!" })
 
   // Save in Database
   try {
     var Cert = new Certificate({
       fullName: fullName,
       phoneNo: phoneNo,
-      email: email,
-      dateIssued: date
+      email: email
     })
     var Cert = await Cert.save();
   } catch (error) {
@@ -51,8 +52,17 @@ app.post('/generate', async (req, res) => {
 
       const duplicateKey = Object.keys(error.keyValue)[0];
       const existingDocument = await Certificate.findOne({ [duplicateKey]: error.keyValue[duplicateKey] });
-      console.log(existingDocument._id);
+      
+      const existingPdf = await fs.readFile("certificates/"+existingDocument._id.toString()+".pdf")
+      const base64String = existingPdf.toString('base64');
+      const fileName = `${existingDocument._id.toString()}.pdf`
 
+      // Duplicate Data
+      return res.status(409).json(
+        {
+          status: "success", CertificateDetails: existingDocument,
+          file: { fileName: fileName, contentType: 'application/pdf', data: base64String }
+        });
     } else {
       console.error('Error saving document:', error);
     }
@@ -61,6 +71,19 @@ app.post('/generate', async (req, res) => {
   }
 
   // Generate Certificate File and Save
+  const pdf = await createCertficatePdf(Cert._id, fullName);
+
+
+  res.status(201).json(
+    {
+      status: "success", CertificateDetails: Cert,
+      file: { pdf }
+    });
+
+});
+
+async function createCertficatePdf(certificate_id, certificate_name)
+{
   try {
     const url = __dirname + '/certificate.pdf';
     const existingPdfBytes = await fs.readFile(url);
@@ -75,7 +98,7 @@ app.post('/generate', async (req, res) => {
     const { width, height } = firstPage.getSize()
 
     // Calculate the width of the text
-    const textWidth = courierBoldText.widthOfTextAtSize(fullName, fontSize);
+    const textWidth = courierBoldText.widthOfTextAtSize(certificate_name, fontSize);
 
     // Calculate the horizontal center position
     const centerX = (firstPage.getWidth() - textWidth) / 2;
@@ -92,7 +115,7 @@ app.post('/generate', async (req, res) => {
     })
 
     // Print Certificate ID
-    firstPage.drawText(Cert._id.toString(), {
+    firstPage.drawText(certificate_id.toString(), {
       x: 80,
       y: height / 2 + 106,
       size: fontSize - 16,
@@ -101,7 +124,7 @@ app.post('/generate', async (req, res) => {
     })
 
     // Print Name
-    firstPage.drawText(fullName, {
+    firstPage.drawText(certificate_name, {
       x: centerX,
       y: height / 2 - 14,
       size: fontSize,
@@ -113,29 +136,20 @@ app.post('/generate', async (req, res) => {
 
     // Bytes to Base64
     var base64String = Buffer.from(pdfBytes).toString('base64');
-    var fileName = `${Cert._id.toString()}.pdf`
+    var fileName = `${certificate_id.toString()}.pdf`
 
     // Save Pdf File Locally
     await fs.writeFile('certificates/' + fileName, pdfBytes);
 
     // developement mode
     // await fs.writeFile(`certificates/generated-pdf.pdf`, pdfBytes);
-
+    return { fileName: fileName, contentType: 'application/pdf', data: base64String }
   }
   catch (error) {
     console.log("Error in Creating Certificate: ", error);
     return;
   }
-
-
-
-  res.status(201).json(
-    {
-      status: "success", CertificateDetails: Cert,
-      file: { fileName: fileName, contentType: 'application/pdf', data: base64String }
-    });
-
-});
+}
 
 // Default Route
 app.get('/', (req, res) => {
