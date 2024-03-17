@@ -16,6 +16,7 @@ const app = express();
 const port = 3000; // or any port of your choice
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })) // for form data
 app.use(cors());
 
 // Connect Database
