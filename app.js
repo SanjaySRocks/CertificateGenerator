@@ -35,6 +35,7 @@ app.post('/generate', async (req, res) => {
   const { fullName, phoneNo, email } = req.body;
 
   var duplicateKey = null;
+  var pdf = null;
 
   if (!fullName || !phoneNo || !email)
     return res.status(400).json({ status: "error", message: "Bad Request Check all required fields!" })
@@ -46,7 +47,12 @@ app.post('/generate', async (req, res) => {
       phoneNo: phoneNo,
       email: email
     })
+
+    // Generate Certificate File and Save
+    pdf = await createCertficatePdf(Cert._id, fullName);
+
     var Cert = await Cert.save();
+    
   } catch (error) {
     if (error.code === 11000 || error.code === 11001) {
       console.error('Duplicate Data');
@@ -70,9 +76,6 @@ app.post('/generate', async (req, res) => {
 
     return;
   }
-
-  // Generate Certificate File and Save
-  const pdf = await createCertficatePdf(Cert._id, fullName);
 
 
   res.status(201).json(
