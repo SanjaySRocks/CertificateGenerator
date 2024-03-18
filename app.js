@@ -22,6 +22,18 @@ app.use(cors());
 // Connect Database
 connectToDatabase();
 
+app.get('/prunedb', async (req, res)=>{
+  try {
+
+    // Delete all documents (certificates) from the collection
+    var result = await Certificate.deleteMany();
+  } catch (error) {
+    console.error('Error:', error);
+  }
+
+  return res.status(200).json({ status: `${result.deletedCount} certificates deleted.` })
+})
+
 // Download File Route
 app.get('/download/:id', (req, res) => {
   const fileid = req.params.id;
