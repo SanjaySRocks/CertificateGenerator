@@ -38,7 +38,7 @@ app.post('/generate', async (req, res) => {
   var pdf = null;
 
   if (!fullName || !phoneNo || !email)
-    return res.status(400).json({ status: "error", message: "Bad Request Check all required fields!" })
+    return res.status(200).json({ status: "error", message: "Bad Request Check all required fields!" })
 
   // Save in Database
   try {
@@ -65,7 +65,7 @@ app.post('/generate', async (req, res) => {
       const fileName = `${existingDocument._id.toString()}.pdf`
 
       // Duplicate Data
-      return res.status(409).json(
+      return res.status(200).json(
         {
           status: "success", CertificateDetails: existingDocument,
           file: { fileName: fileName, contentType: 'application/pdf', data: base64String }
