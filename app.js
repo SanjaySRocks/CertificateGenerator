@@ -202,7 +202,12 @@ async function createCertficatePdf(certificate_id, certificate_name)
 
 // Default Route
 app.get('/', (req, res) => {
-  res.status(200).json({ message: "Certificate Generate Rest API", link: "github.com/sanjaysrocks", Usage: "To Create Certificate Use /generate endpoint (post request)" })
+  res.status(200).json(
+    { 
+      apiName: "Certificate Generate API", 
+      author: "https://github.com/sanjaysrocks", 
+      Usage: "To Create Certificate Use /generate endpoint (post request)" 
+    })
 });
 
 
