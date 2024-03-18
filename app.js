@@ -22,6 +22,25 @@ app.use(cors());
 // Connect Database
 connectToDatabase();
 
+// Create certificates folder if not exists
+const certificatesDir = './certificates'; // Directory path
+
+async function createCertificatesDir() {
+  try {
+    // Check if the directory exists
+    await fs.access(certificatesDir);
+    console.log(`${certificatesDir} already exists.`);
+  } catch (error) {
+    // Create the directory if it doesn't exist
+    await fs.mkdir(certificatesDir);
+    console.log(`${certificatesDir} created successfully.`);
+  }
+}
+
+createCertificatesDir().catch(error => {
+  console.error('Error:', error);
+});
+
 app.get('/prunedb', async (req, res)=>{
   try {
 
@@ -72,7 +91,14 @@ app.post('/generate', async (req, res) => {
       const duplicateKey = Object.keys(error.keyValue)[0];
       const existingDocument = await Certificate.findOne({ [duplicateKey]: error.keyValue[duplicateKey] });
       
-      const existingPdf = await fs.readFile("certificates/"+existingDocument._id.toString()+".pdf")
+      try{
+        var existingPdf = await fs.readFile("certificates/"+existingDocument._id.toString()+".pdf")
+      }
+      catch(e)
+      {
+        return res.status(200).json({ error: e});
+      }
+
       const base64String = existingPdf.toString('base64');
       const fileName = `${existingDocument._id.toString()}.pdf`
 
@@ -155,8 +181,15 @@ async function createCertficatePdf(certificate_id, certificate_name)
     var fileName = `${certificate_id.toString()}.pdf`
 
     // Save Pdf File Locally
-    await fs.writeFile('certificates/' + fileName, pdfBytes);
 
+    try{
+      await fs.writeFile('certificates/' + fileName, pdfBytes);
+    }
+    catch(error)
+    {
+      console.log(error); 
+    }
+    
     // developement mode
     // await fs.writeFile(`certificates/generated-pdf.pdf`, pdfBytes);
     return { fileName: fileName, contentType: 'application/pdf', data: base64String }
