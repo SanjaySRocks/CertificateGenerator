@@ -5,6 +5,7 @@ services:
     build:
      context: .
      dockerfile: Dockerfile
+    restart: "always"
     #image: cgv2
     ports:
       - "3000:3000"
