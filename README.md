@@ -58,14 +58,14 @@ body:
         "pdf": {
             "fileName": "65f88fda0a4a48b12f0d5744.pdf",
             "contentType": "application/pdf",
-            "data": "QwY7bPSG57izCrys58hjqU9ZvMUOBysX02hBTvny3lfZYia+qlq58cVavLJ5kocgSCrylS8wMGRcbK5srYfGdwsbx2627ZB2YuTJFbX3+3znn/XrnL5fyo+gIRBWVPfdRIlMOc5dNCkRX6Kfi0SVw2OCyf2FK39FDtu0Fn/ZhvE7NL7i6B1yS2ubwtQBfzD2tUgNHkaOXc5YDNL+rl9RAf6+pmgNmbqo0BuHVYllVL6f022F4ur5ftjD8d2L7eXHdvnnZHk7vBdEMvRS9Bp4DsKpQS3SC7oVPr/W6vsBCerNw1dKMJitLmGlrtCrCvQdsi7cuf0rv6RwclMgmHy77y3KbM6zlOHqZ3V/vCGU7ase+N92fz8XaTcLYY+/55b1aKse+m92fl2PfW+..."
+            "data": "QwY7bPSG57izCrys58hjqU9ZvMUOBysX02hBTvny3lfZYia..."
         }
     }
 }
 ```
 ## Screenshots
 
-![Certificate Screenshot](screenshot/GreenIndiaCert-1694541456.jpg?raw=true)
+![Certificate Screenshot](screenshot/65f9c49b23d98c2defdc550c.jpg?raw=true)
 
 
 ## Authors
