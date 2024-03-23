@@ -9,7 +9,7 @@ services:
     #image: cgv2
     ports:
       - "3000:3000"
-    #volumes:
-     # - .:/app
+    volumes:
+      - ./certificates:/app/certificates
     environment:
       - NODE_ENV=development
