@@ -1,6 +1,9 @@
 # Certificate Generator Rest API
 
 A certificate generate rest api which takes name and generate certificate with unique id.
+
+[![Docker Build](https://github.com/SanjaySRocks/CertificateGenerator/actions/workflows/docker-image.yml/badge.svg)](https://github.com/SanjaySRocks/CertificateGenerator/actions/workflows/docker-image.yml)
+
 ## Installation and Deployment
 
 To deploy this project run
